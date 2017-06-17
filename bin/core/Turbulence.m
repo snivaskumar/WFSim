@@ -1,21 +1,24 @@
 % Define spatial varying mixing-length parameter
-
 xline            = sort(unique(xline));
 
-%x                = [zeros(1,xline(1)+n) linspace(0,lmu,xline(2)-xline(1)-m)]';
-%x                = [x;zeros(m,1);linspace(0,lmu,xline(3)-xline(2)-m)'];
-%x                = [x;zeros(m,1);linspace(0,lmu,Nx-xline(3)-n)'];
-%y                = [zeros(1,yline{1}(1)-1) ones(1,length(yline{1})) zeros(1,Ny-yline{1}(end))] ;
-%mixing_length    = (repmat(x,1,Ny).*repmat(y,Nx,1))*0.5*Drotor;
-
-x                = [zeros(1,xline(1)+n) linspace(0,lmu,Nx-xline(1)-n)]';
-y                = [zeros(1,yline{1}(1)-1) ones(1,length(yline{1})) zeros(1,Ny-yline{1}(end))] ;
-mixing_length    = (repmat(x,1,Ny).*repmat(y,Nx,1))*0.5*Drotor;
-
-
-
-
-
+if N==1
+    x                = [zeros(1,xline(1)+n) linspace(0,lmu,Nx-xline(1)-n)]';
+    y                = [zeros(1,yline{1}(1)-1) ones(1,length(yline{1})) zeros(1,Ny-yline{1}(end))] ;
+    mixing_length    = (repmat(x,1,Ny).*repmat(y,Nx,1))*0.5*Drotor;
+elseif N==2
+    x                = [zeros(1,xline(1)+n) linspace(0,lmu,xline(1+1)-xline(1)-4*n)]';
+    x                = [x;zeros(4*n,1);linspace(0,lmu,Nx-xline(2)-n)'];
+    y                = [zeros(1,yline{1}(1)-1) ones(1,length(yline{1})) zeros(1,Ny-yline{1}(end))] ;
+    mixing_length    = (repmat(x,1,Ny).*repmat(y,Nx,1))*0.5*Drotor;
+    
+elseif N==3
+    xline            = sort(unique(xline));
+    x                = [zeros(1,xline(1)+n) linspace(0,lmu,xline(2)-xline(1)-m)]';
+    x                = [x;zeros(m,1);linspace(0,lmu,xline(3)-xline(2)-m)'];
+    x                = [x;zeros(m,1);linspace(0,lmu,Nx-xline(3)-n)'];
+    y                = [zeros(1,yline{1}(1)-1) ones(1,length(yline{1})) zeros(1,Ny-yline{1}(end))] ;
+    mixing_length    = (repmat(x,1,Ny).*repmat(y,Nx,1))*0.5*Drotor;
+end
 H                = fspecial('disk',.5); % You need Nx,Nx to keep it symmetric
 mixing_length    = filter2(H,mixing_length);
 

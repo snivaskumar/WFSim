@@ -47,10 +47,10 @@ for k=1:Wp.sim.NN
         end
         
         if k>=20
-            input{k}.beta = input{k}.beta+[.1;0];
+            input{k}.beta = input{k}.beta+[0;.1];
         end
 %         if k>=70
-%             input{k}.beta = input{k}.beta-.1;
+%             input{k}.beta = input{k}.beta+[0;0];
 %         end
 
 
@@ -74,15 +74,17 @@ end
 %%
 figure(2);clf
 subplot(3,2,1)
-plot(Power(1,:));grid;xlabel('k');ylabel('Power')
+plot(Power(1,:));grid;xlabel('k');ylabel('P_1')
 subplot(3,2,3)
-plot(a(1,:));grid;xlabel('k');ylabel('a')
+plot(a(1,:));grid;xlabel('k');ylabel('a_1')
 subplot(3,2,5)
-plot(Ueffect(1,:));grid;xlabel('k');ylabel('U_\infty')
+plot(Ueffect(1,:));grid;xlabel('k');ylabel('U_1')
 
 subplot(3,2,2)
-plot(Power(2,:));grid;xlabel('k');ylabel('Power')
+plot(Power(2,:));grid;xlabel('k');ylabel('P_2')
 subplot(3,2,4)
-plot(a(2,:));grid;xlabel('k');ylabel('a')
+plot(a(2,:));grid;xlabel('k');ylabel('a_2')
 subplot(3,2,6)
-plot(Ueffect(2,:));grid;xlabel('k');ylabel('U_\infty')
+plot(Ueffect(2,:));grid;xlabel('k');ylabel('U_2')
+
+
