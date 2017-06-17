@@ -1,4 +1,4 @@
-function [sys,Power,Ueffect,a,CT] = Make_Ax_b(Wp,sys,sol,input,B1,B2,bc,k,options)
+function [sys,Power,Ueffect,a,CT,Wp] = Make_Ax_b(Wp,sys,sol,input,B1,B2,bc,k,options)
 Nx    = Wp.mesh.Nx;
 Ny    = Wp.mesh.Ny;
 
@@ -12,7 +12,7 @@ options.k = k;
 
 [StrucDiscretization]                = SpatialDiscr_Hybrid(Wp,sol.u,sol.v,0); % Spatial discretization
 [StrucDiscretization,StrucDynamical] = Dynamical(Wp,StrucDiscretization,sol.u,sol.v,dt,0); % Dynamical term
-[StrucActuator,Ueffect,a,Power,CT]   = Actuator(Wp,input,sol,options); % Actuator
+[StrucActuator,Ueffect,a,Power,CT,Wp]= Actuator(Wp,input,sol,options); % Actuator
 [StrucDiscretization,StrucBCs]       = BoundaryConditions(Nx,Ny,StrucDiscretization,sol.u,sol.v,0); % Zero gradient boundary conditions momentum equations
 
 % Setup A matrix

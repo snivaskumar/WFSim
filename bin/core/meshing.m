@@ -18,8 +18,8 @@ switch lower(Wp.name)
         Ly     = 600;           % Domain length in y-direction (m)
         Nx     = 50;             % Number of grid points in x-direction
         Ny     = 25;             % Number of grid points in y-direction
-        Crx    = [400+6*90];     % Turbine locations in x-direction (m)
-        Cry    = [300];       % Turbine locations in y-direction (m)
+        Crx    = [400+6*90 400+2*6*90];     % Turbine locations in x-direction (m)
+        Cry    = [300 300];       % Turbine locations in y-direction (m)
         
         loadedinput = load([WFSimfolder 'Data_SOWFA\YawCase3\system_input.mat']); % load input settings
         loadedinput.input.phi = 0*loadedinput.input.phi;
@@ -27,29 +27,29 @@ switch lower(Wp.name)
         % Correctly format inputs (temporary function)
         for j = 1:length(loadedinput.input.t)
             input{j}.t    = loadedinput.input.t(j);
-            input{j}.beta = [loadedinput.input.beta(j,1)'];
-            input{j}.phi  = [loadedinput.input.phi(j,1)'];
+            input{j}.beta = [loadedinput.input.beta(j,:)'];
+            input{j}.phi  = [loadedinput.input.phi(j,:)'];
         end;
         
         % Calculate delta inputs
         for j = 1:length(loadedinput.input.t)-1
-            input{j}.dbeta = [loadedinput.input.beta(j+1,1)'- loadedinput.input.beta(j,1)'];
-            input{j}.dphi  = [loadedinput.input.phi(j+1,1)' - loadedinput.input.phi(j,1)'] ;
+            input{j}.dbeta = [loadedinput.input.beta(j+1,:)'- loadedinput.input.beta(j,:)'];
+            input{j}.dphi  = [loadedinput.input.phi(j+1,:)' - loadedinput.input.phi(j,:)'] ;
         end;
         
         Drotor      = 90;     % Turbine rotor diameter in (m)
         powerscale  = 1.0;    % Turbine powerscaling
-        forcescale  = 1;    % Turbine force scaling
+        forcescale  = 1.25;    % Turbine force scaling
         
         h        = 1.0;       % Sampling time (s)
-        L        = 350;       % Simulation length (s)
+        L        = 120;       % Simulation length (s)
         mu       = 0*18e-5;     % Dynamic flow viscosity
         Rho      = 1.20;      % Flow density (kg m-3)
-        u_Inf    = 9.0;       % Freestream flow velocity x-direction (m/s)
+        u_Inf    = 8.0;       % Freestream flow velocity x-direction (m/s)
         v_Inf    = 0.0;       % Freestream flow velocity y-direction (m/s)
         p_init   = 0.0;       % Initial values for pressure terms (Pa)
         
-        lmu      = 1.75;         % Mixing length in x-direction (m)
+        lmu      = 2;         % Mixing length in x-direction (m)
         turbul   = true;      % Use mixing length turbulence model (true/false)
         n        = 2;
         m        = 6;

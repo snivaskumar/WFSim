@@ -1,4 +1,4 @@
-function [output,Ueffect,a,Power,CT] = Actuator(Wp,input,sol,options)
+function [output,Ueffect,a,Power,CT,Wp] = Actuator(Wp,input,sol,options)
 
 Nx          = Wp.mesh.Nx;
 Ny          = Wp.mesh.Ny;
@@ -39,47 +39,37 @@ for kk=1:N
   
     a(kk)         = input.beta(kk)/(input.beta(kk)+1);  
     CT(kk)        = 4*a(kk)*F*(1-a(kk));
-   
+    CP(kk)        = 4*a(kk)*F*(1-a(kk))^2;
+    
     Ueffect(kk)   = mean(Ue{kk})/(1-a(kk));     % Estimation effective wind speed
     
     %% Thrust force
     Fthrust       = 1/2*Rho*Ue{kk}.^2*CT(kk)*(input.beta(kk)+1).^2;
     Fx            = Fthrust.*cos(input.phi(kk)*pi/180);
     Fy            = Fthrust.*sin(input.phi(kk)*pi/180);
-    
-    %% Power
-    Power(kk)     = mean(powerscale*.5*Rho*Ar*(Ue{kk}).^3*CT(kk)*cos(input.phi(kk)*pi/180)^(1.88));
-
+        
+    %% Linear turbine model
     if k==2
-        a0      = a(kk);            % linearisation point
-        Uinf0   = Ueffect(kk);      % linearisation point
+        Wp.turbine.a0{kk}      = a(kk);            % linearisation point
+        Wp.turbine.Uinf0{kk}   = Ueffect(kk);      % linearisation point
         
         CreateTurbineModel
     end    
-    
+        
+    %% Input to Ax=b
     if k>=2
-        w         = [ zeros(1,1) ; input.dbeta(kk)];
+        % y = [dF dP]^T
+        w                        = [Wp.turbine.Uinf0{kk}-Ueffect(kk) ; Wp.turbine.a0{kk}-a(kk)];
+        Wp.turbine.xT{kk}(:,k+1) = Wp.turbine.A{kk}*Wp.turbine.xT{kk}(:,k) + Wp.turbine.B{kk}*w;
+        Wp.turbine.yT{kk}(:,k)   = Wp.turbine.C{kk}*Wp.turbine.xT{kk}(:,k) + Wp.turbine.D{kk}*w;
         
-        xT1(:,k+1) = A*xT1(:,k) + B*w(:,k);
-        
-        x(:,k+1) = A*x(:,k) + B*w(:,k);
-        y(:,k)   = C*x(:,k) + D*w(:,k);
+        Sm.x(x-2,y-1)  = -(Wp.turbine.F0{kk}-Wp.turbine.yT{kk}(1,k)).*dyy2(1,y)';
+        Power(kk)      = Wp.turbine.P0{kk}-Wp.turbine.yT{kk}(2,k);
+    else
+        Sm.x(x-2,y-1)  = -Fx'.*dyy2(1,y)'; 
+        Power(kk)      = CP(kk)*powerscale*.5*Rho*Ar*Ueffect(kk).^3;% Input x-mom nonlinear                           
     end
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    %% Input to Ax=b
-    Sm.x(x-2,y-1)           = -Fx'.*dyy2(1,y)';                                                                  % Input x-mom nonlinear                           % Input x-mom linear
     Sm.y(x-1,y(2:end)-2)    = scale*Fy(2:end)'.*dyy2(1,y(2:end))';                                               % Input y-mom nonlinear
     
 end

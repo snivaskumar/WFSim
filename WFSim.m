@@ -15,7 +15,7 @@ WFSim_addpaths
 options.startUniform   = 0;                      % Start from a uniform flowfield (true) or a steady-state solution (false)
 Wp.name                = 'RobustMpc';
 
-Animate       = 1;                      % Show 2D flow fields every x iterations (0: no plots)
+Animate       = 10 ;                     % Show 2D flow fields every x iterations (0: no plots)
 plotMesh      = 0;                      % Show meshing and turbine locations
 conv_eps      = 1e-6;                   % Convergence threshold
 max_it_dyn    = 1;                      % Maximum number of iterations for k > 1
@@ -46,7 +46,16 @@ for k=1:Wp.sim.NN
             max_it = max_it_dyn; 
         end
         
-        [sys,Power(:,k),Ueffect(:,k),a(:,k),CT(:,k)] = ...
+        if k>=20
+            input{k}.beta = input{k}.beta+[.1;0];
+        end
+%         if k>=70
+%             input{k}.beta = input{k}.beta-.1;
+%         end
+
+
+        
+        [sys,Power(:,k),Ueffect(:,k),a(:,k),CT(:,k),Wp] = ...
                     Make_Ax_b(Wp,sys,sol,input{k},B1,B2,bc,k,options);              % Create system matrices
         [sol,sys] = Computesol(sys,input{k},sol,k,it,options);                      % Compute solution
         [sol,eps] = MapSolution(Wp.mesh.Nx,Wp.mesh.Ny,sol,k,it,options);            % Map solution to field
@@ -61,3 +70,19 @@ for k=1:Wp.sim.NN
     
 
 end
+
+%%
+figure(2);clf
+subplot(3,2,1)
+plot(Power(1,:));grid;xlabel('k');ylabel('Power')
+subplot(3,2,3)
+plot(a(1,:));grid;xlabel('k');ylabel('a')
+subplot(3,2,5)
+plot(Ueffect(1,:));grid;xlabel('k');ylabel('U_\infty')
+
+subplot(3,2,2)
+plot(Power(2,:));grid;xlabel('k');ylabel('Power')
+subplot(3,2,4)
+plot(a(2,:));grid;xlabel('k');ylabel('a')
+subplot(3,2,6)
+plot(Ueffect(2,:));grid;xlabel('k');ylabel('U_\infty')
