@@ -16,12 +16,3 @@ StrucDynamical.ccx    = vec(Rho.*dxx(3:end-1,2:end-1)'.*dyy2(3:end-1,2:end-1)'./
 StrucDynamical.cx     = StrucDynamical.ccx.*vec(u(3:end-1,2:end-1)');
 StrucDynamical.ccy    = vec(Rho.*dxx2(2:end-1,3:end-1)'.*dyy(2:end-1,3:end-1)'./dt);
 StrucDynamical.cy     = StrucDynamical.ccy.*vec(v(2:end-1,3:end-1)');
-
-if Linearversion
-    StrucDiscretization.dax.P   = StrucDiscretization.dax.P + Rho.*dxx.*dyy2./dt;       
-    StrucDiscretization.day.P   = StrucDiscretization.day.P + Rho.*dxx2.*dyy./dt;
-    StrucDynamical.dcdx         = blkdiag(spdiags(StrucDynamical.ccx,0,length(StrucDynamical.ccx),length(StrucDynamical.ccx)),...
-                                             spdiags(StrucDynamical.ccy,0,length(StrucDynamical.ccy),length(StrucDynamical.ccy)),...
-                                             sparse((Ny-2)*(Nx-2),(Ny-2)*(Nx-2)) );
-end;
-
