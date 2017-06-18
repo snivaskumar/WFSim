@@ -46,12 +46,12 @@ for k=1:Wp.sim.NN
             max_it = max_it_dyn; 
         end
         
-        if k>=20
-            input{k}.beta = input{k}.beta+[0;.1];
-        end
-%         if k>=70
-%             input{k}.beta = input{k}.beta+[0;0];
+%         if k>=20
+%             input{k}.beta = input{k}.beta+[0;.1];
 %         end
+        if k>=70
+            input{k}.beta = input{k}.beta+[0;0];
+        end
 
 
         
