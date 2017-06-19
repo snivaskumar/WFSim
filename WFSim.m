@@ -28,47 +28,47 @@ if options.startUniform==1; max_it = 1; else max_it = 50; end
 if Animate > 0
     scrsz = get(0,'ScreenSize');
     hfig = figure('color',[0 166/255 214/255],'units','normalized','outerposition',...
-           [0 0 1 1],'ToolBar','none','visible', 'on'); 
+        [0 0 1 1],'ToolBar','none','visible', 'on');
 end
 
-%% Loop 
+%% Loop
 for k=1:Wp.sim.NN
     tic
     it        = 0;
     eps       = 1e19;
     epss      = 1e20;
-
+    
     while ( eps>conv_eps && it<max_it && eps<epss );
         it   = it+1;
         epss = eps;
         
-        if k>1 
-            max_it = max_it_dyn; 
+        if k>1
+            max_it = max_it_dyn;
         end
         
-%         if k>=20
-%             input{k}.beta = input{k}.beta+[0;.1];
-%         end
-        if k>=70
-            input{k}.beta = input{k}.beta+[0;0];
-        end
-
-
+        %         if k>=20
+        %             input{k}.beta = input{k}.beta+[0;.1];
+        %         end
+        if k==20
+            Wp.site.u_Inf           = 7.5;
+            [B1,B2,bc]              = Compute_B1_B2_bc(Wp);
+            sol.u(1:2,1:Wp.mesh.Ny) = Wp.site.u_Inf;
+        end    
         
         [sys,Power(:,k),Ueffect(:,k),a(:,k),CT(:,k),Wp] = ...
-                    Make_Ax_b(Wp,sys,sol,input{k},B1,B2,bc,k,options);              % Create system matrices
+            Make_Ax_b(Wp,sys,sol,input{k},B1,B2,bc,k,options);              % Create system matrices
         [sol,sys] = Computesol(sys,input{k},sol,k,it,options);                      % Compute solution
         [sol,eps] = MapSolution(Wp.mesh.Nx,Wp.mesh.Ny,sol,k,it,options);            % Map solution to field
         
     end
- 
+    
     if Animate > 0
         if ~rem(k,Animate)
-            Animation; 
-        end; 
-    end; 
+            Animation;
+        end;
+    end;
     
-
+    
 end
 
 %%
