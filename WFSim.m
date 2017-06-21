@@ -13,7 +13,7 @@ WFSim_addpaths
 
 %% Initialize script
 options.startUniform   = 0;                      % Start from a uniform flowfield (true) or a steady-state solution (false)
-Wp.name                = 'RobustMpc';
+Wp.name                = 'WFSim_i';
 
 Animate       = 10 ;                     % Show 2D flow fields every x iterations (0: no plots)
 plotMesh      = 0;                      % Show meshing and turbine locations
@@ -49,11 +49,11 @@ for k=1:Wp.sim.NN
         %         if k>=20
         %             input{k}.beta = input{k}.beta+[0;.1];
         %         end
-        if k==20
-            Wp.site.u_Inf           = 7.5;
-            [B1,B2,bc]              = Compute_B1_B2_bc(Wp);
-            sol.u(1:2,1:Wp.mesh.Ny) = Wp.site.u_Inf;
-        end    
+        %if k==20
+        %    Wp.site.u_Inf           = 7.5;
+        %    [B1,B2,bc]              = Compute_B1_B2_bc(Wp);
+        %    sol.u(1:2,1:Wp.mesh.Ny) = Wp.site.u_Inf;
+        %end    
         
         [sys,Power(:,k),Ueffect(:,k),a(:,k),CT(:,k),Wp] = ...
             Make_Ax_b(Wp,sys,sol,input{k},B1,B2,bc,k,options);              % Create system matrices

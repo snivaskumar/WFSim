@@ -54,6 +54,48 @@ switch lower(Wp.name)
         n        = 2;
         m        = 6;
         
+    case lower('WFSim_i')
+        type   = 'lin';          % Meshing type ('lin' or 'exp')
+        Lx     = 5*90;           % Domain length in x-direction (m)
+        Ly     = 200;           % Domain length in y-direction (m)
+        Nx     = 25;             % Number of grid points in x-direction
+        Ny     = 10;             % Number of grid points in y-direction
+        Crx    = [90];     % Turbine locations in x-direction (m)
+        Cry    = [100];       % Turbine locations in y-direction (m)
+        
+        loadedinput = load([WFSimfolder 'Data_SOWFA\YawCase3\system_input.mat']); % load input settings
+        loadedinput.input.phi = 0*loadedinput.input.phi;
+        loadedinput.input.beta = 0*loadedinput.input.beta;
+        
+        % Correctly format inputs (temporary function)
+        for j = 1:length(loadedinput.input.t)
+            input{j}.t    = loadedinput.input.t(j);
+            input{j}.beta = [loadedinput.input.beta(j,:)'];
+            input{j}.phi  = [loadedinput.input.phi(j,:)'];
+        end;
+        
+        % Calculate delta inputs
+        for j = 1:length(loadedinput.input.t)-1
+            input{j}.dbeta = [loadedinput.input.beta(j+1,:)'- loadedinput.input.beta(j,:)'];
+            input{j}.dphi  = [loadedinput.input.phi(j+1,:)' - loadedinput.input.phi(j,:)'] ;
+        end;
+        
+        Drotor      = 90;     % Turbine rotor diameter in (m)
+        powerscale  = 1.0;    % Turbine powerscaling
+        forcescale  = 1.25;    % Turbine force scaling
+        
+        h        = 1.0;       % Sampling time (s)
+        L        = 60;       % Simulation length (s)
+        mu       = 0*18e-5;     % Dynamic flow viscosity
+        Rho      = 1.20;      % Flow density (kg m-3)
+        u_Inf    = 3.0;       % Freestream flow velocity x-direction (m/s)
+        v_Inf    = 0.0;       % Freestream flow velocity y-direction (m/s)
+        p_init   = 0.0;       % Initial values for pressure terms (Pa)
+        
+        lmu      = 2;         % Mixing length in x-direction (m)
+        turbul   = true;      % Use mixing length turbulence model (true/false)
+        n        = 2;
+        m        = 6;
         
     otherwise
         error('No valid meshing specified. Please take a look at Wp.name.');
