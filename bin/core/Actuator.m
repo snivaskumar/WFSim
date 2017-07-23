@@ -75,5 +75,3 @@ for kk=1:N
 end
 % Write to output
 output.Sm  = Sm;
-
-

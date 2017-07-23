@@ -18,8 +18,8 @@ switch lower(Wp.name)
         Ly     = 600;           % Domain length in y-direction (m)
         Nx     = 50;             % Number of grid points in x-direction
         Ny     = 25;             % Number of grid points in y-direction
-        Crx    = [400+6*90 400+2*6*90];     % Turbine locations in x-direction (m)
-        Cry    = [300 300];       % Turbine locations in y-direction (m)
+        Crx    = [400 400+6*90 400+2*6*90];     % Turbine locations in x-direction (m)
+        Cry    = [300 300 300];       % Turbine locations in y-direction (m)
         
         loadedinput = load([WFSimfolder 'Data_SOWFA\YawCase3\system_input.mat']); % load input settings
         loadedinput.input.phi = 0*loadedinput.input.phi;
@@ -27,14 +27,14 @@ switch lower(Wp.name)
         % Correctly format inputs (temporary function)
         for j = 1:length(loadedinput.input.t)
             input{j}.t    = loadedinput.input.t(j);
-            input{j}.beta = [loadedinput.input.beta(j,:)'];
-            input{j}.phi  = [loadedinput.input.phi(j,:)'];
+            input{j}.beta = [1/3;1/3;1/3];
+            input{j}.phi  = [0;0;0];
         end;
         
         % Calculate delta inputs
         for j = 1:length(loadedinput.input.t)-1
-            input{j}.dbeta = [loadedinput.input.beta(j+1,:)'- loadedinput.input.beta(j,:)'];
-            input{j}.dphi  = [loadedinput.input.phi(j+1,:)' - loadedinput.input.phi(j,:)'] ;
+            input{j}.dbeta = input{j+1}.beta- input{j}.beta;
+            input{j}.dphi  = input{j+1}.phi- input{j}.phi;
         end;
         
         Drotor      = 90;     % Turbine rotor diameter in (m)

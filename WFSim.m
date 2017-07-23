@@ -13,9 +13,9 @@ WFSim_addpaths
 
 %% Initialize script
 options.startUniform   = 0;                      % Start from a uniform flowfield (true) or a steady-state solution (false)
-Wp.name                = 'WFSim_i';
+Wp.name                = 'RobustMpc';
 
-Animate       = 10 ;                     % Show 2D flow fields every x iterations (0: no plots)
+Animate       = 10 ;                    % Show 2D flow fields every x iterations (0: no plots)
 plotMesh      = 0;                      % Show meshing and turbine locations
 conv_eps      = 1e-6;                   % Convergence threshold
 max_it_dyn    = 1;                      % Maximum number of iterations for k > 1
@@ -46,9 +46,9 @@ for k=1:Wp.sim.NN
             max_it = max_it_dyn;
         end
         
-        %         if k>=20
-        %             input{k}.beta = input{k}.beta+[0;.1];
-        %         end
+        %if k>=20
+        %    input{k}.beta = input{k}.beta+[0;.1];
+        %end
         %if k==20
         %    Wp.site.u_Inf           = 7.5;
         %    [B1,B2,bc]              = Compute_B1_B2_bc(Wp);
@@ -59,6 +59,7 @@ for k=1:Wp.sim.NN
             Make_Ax_b(Wp,sys,sol,input{k},B1,B2,bc,k,options);              % Create system matrices
         [sol,sys] = Computesol(sys,input{k},sol,k,it,options);                      % Compute solution
         [sol,eps] = MapSolution(Wp.mesh.Nx,Wp.mesh.Ny,sol,k,it,options);            % Map solution to field
+        
         
     end
     
