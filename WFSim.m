@@ -63,7 +63,7 @@ perturbation  = 2*rand(Q,length(Wp.mesh.yline{1}))-1;
 for l=1:Q
     
     % Apply perturbation in front of first turbine
-    sol.u(nx1-1,ny1) = uss(nx1-1,ny1) + 3*perturbation(l,:);
+    sol.u(nx1-1,ny1) = uss(nx1-1,ny1) + perturbation(l,:);
     
     for k=2:Wp.sim.NN
         
