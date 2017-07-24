@@ -27,7 +27,7 @@ switch lower(Wp.name)
         % Correctly format inputs (temporary function)
         for j = 1:length(loadedinput.input.t)
             input{j}.t    = loadedinput.input.t(j);
-            input{j}.beta = [1/3;1/3;1/3];
+            input{j}.beta = [1/2;1/2;1/2];
             input{j}.phi  = [0;0;0];
         end;
         
@@ -42,7 +42,7 @@ switch lower(Wp.name)
         forcescale  = 1.25;    % Turbine force scaling
         
         h        = 1.0;       % Sampling time (s)
-        L        = 200;       % Simulation length (s)
+        L        = 30;       % Simulation length (s)
         mu       = 0*18e-5;     % Dynamic flow viscosity
         Rho      = 1.20;      % Flow density (kg m-3)
         u_Inf    = 8.0;       % Freestream flow velocity x-direction (m/s)
