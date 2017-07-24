@@ -54,17 +54,30 @@ ny2           = Wp.mesh.yline{2};
 nx2           = Wp.mesh.xline(2);
 ny3           = Wp.mesh.yline{3};
 nx3           = Wp.mesh.xline(3);
-uss           = sol.u; % steady-state solution
+uss           = sol.u; % steady-state solutions
+vss           = sol.v; 
+pss           = sol.p; 
+uInfss        = sol.u(1); % steady-state free-stream velocity
 
 Q             = 10; % number of perturbations
-perturbation  = 2*rand(Q,length(Wp.mesh.yline{1}))-1;
+%perturbation  = 2*rand(Q,length(Wp.mesh.yline{1}))-1;
+perturbation  = 2*rand(Q,1)-1;
 
 % Time loop
 for l=1:Q
     
     % Apply perturbation in front of first turbine
-    sol.u(nx1-1,ny1) = uss(nx1-1,ny1) + perturbation(l,:);
+    %sol.u(nx1-1,ny1) = uss(nx1-1,ny1) + perturbation(l,:); % check why not working    
     
+    % Set to steady-state
+    sol.u                   = uss;
+    sol.v                   = vss;
+    sol.p                   = pss;
+    % Apply perturbation
+    Wp.site.u_Inf           = uInfss+perturbation(l);
+    [B1,B2,bc]              = Compute_B1_B2_bc(Wp);
+    sol.u(1:2,1:Wp.mesh.Ny) = Wp.site.u_Inf;
+        
     for k=2:Wp.sim.NN
         
         % Save velocities in front and behind turbines
