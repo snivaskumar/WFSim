@@ -21,21 +21,44 @@ conv_eps      = 1e-6;                   % Convergence threshold
 max_it_dyn    = 1;                      % Maximum number of iterations for k > 1
 it            = 1;
 
-if options.startUniform==0; max_it = 1; else max_it = 1; end
+if options.startUniform==1; max_it = 50; else max_it = 1; end
 
 % WFSim general initialization script
 [Wp,sol,sys,Power,CT,a,Ueffect,input,B1,B2,bc] = InitWFSim(Wp,options,plotMesh);
 
-load('data_WFSim/sstate')
-sol.u  = uss; sol.uu = uss;
-sol.v  = vss; sol.vv = vss;
-sol.p  = pss; sol.pp = pss;
+
 
 if Animate > 0
     scrsz = get(0,'ScreenSize');
     hfig = figure('color',[0 166/255 214/255],'units','normalized','outerposition',...
         [0 0 1 1],'ToolBar','none','visible', 'on');
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ny1           = Wp.mesh.yline{1};
 nx1           = Wp.mesh.xline(1);
@@ -61,9 +84,9 @@ for l=1:Q
         [sol,eps] = MapSolution(Wp.mesh.Nx,Wp.mesh.Ny,sol,k,it,options);    % Map solution to field
         
         % Save velocities in front and behind turbines 
-        flow.T1.up(:,:,k,l)   = sol.u(nx1-1,ny1);  % flow.u(x,y,time,perturbation,turbine)
-        flow.T1.down(:,:,k,l) = sol.u(nx1+1,ny1);
-        flow.T2.up(:,:,k,l)   = sol.u(nx2-1,ny2);
+        flow.T1.up(:,:,k,l)   = sol.u(nx1-1,ny1);  % flow.turbine1.upwind(x,y,time,perturbation)
+        flow.T1.down(:,:,k,l) = sol.u(nx1+1,ny1);  % flow.turbine2.downwind(x,y,time,perturbation)
+        flow.T2.up(:,:,k,l)   = sol.u(nx2-1,ny2);  % maybe take mean here
         flow.T2.down(:,:,k,l) = sol.u(nx2+1,ny2);
         flow.T3.up(:,:,k,l)   = sol.u(nx3-1,ny3);
         flow.T3.down(:,:,k,l) = sol.u(nx3+1,ny3);
