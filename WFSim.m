@@ -13,7 +13,7 @@ options.exportPressures= ~options.Projection;    % Calculate pressure fields
 Wp.name             = 'RobustMpc';      % Meshing name (see "\bin\core\meshing.m")
 Wp.Turbulencemodel  = 'WFSim3';
 
-Animate       = 1;                      % Show 2D flow fields every x iterations (0: no plots)
+Animate       = 100;                      % Show 2D flow fields every x iterations (0: no plots)
 plotMesh      = 0;                      % Show meshing and turbine locations
 conv_eps      = 1e-6;                   % Convergence threshold
 max_it_dyn    = 1;                      % Maximum number of iterations for k > 1
@@ -44,7 +44,7 @@ for k=1:1
     if Animate>0;if~rem(k,Animate);Animation;end;end;
 end;
 disp('Wind farm in steady-state.');
-
+clear Power a Ueffect Wp.sim.time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Initialize and apply perturbations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,69 +55,95 @@ nx2           = Wp.mesh.xline(2);
 ny3           = Wp.mesh.yline{3};
 nx3           = Wp.mesh.xline(3);
 uss           = sol.u; % steady-state solutions
-vss           = sol.v; 
-pss           = sol.p; 
+vss           = sol.v;
+pss           = sol.p;
 uInfss        = sol.u(1); % steady-state free-stream velocity
 
-Q             = 10; % number of perturbations
-%perturbation  = 2*rand(Q,length(Wp.mesh.yline{1}))-1;
-perturbation  = 2*rand(Q,1)-1;
+% Number of perturbed trajectories
+Ns            = 5;
+% Number of samples in one time series
+Np            = 100;
+% Vf is one measurement trajectory
+Vf            = repmat(uInfss+2-4*rand(1,Np),Ns,1);%repmat(uInfss+.5*[zeros(1,100) ones(1,400)],Ns,1);%
+% Vs is random perturbed measurement trajectory
+Vs            = Vf + 2*rand(Ns,Np);
+% Time vector simulation
+Wp.sim.h      = 1;  
+Wp.sim.time   = 0:Wp.sim.h:Np;
 
-% Time loop
-for l=1:Q
-    
-    % Apply perturbation in front of first turbine
-    %sol.u(nx1-1,ny1) = uss(nx1-1,ny1) + perturbation(l,:); % check why not working    
+for l=1:Ns
     
     % Set to steady-state
     sol.u                   = uss;
     sol.v                   = vss;
     sol.p                   = pss;
-    % Apply perturbation
-    Wp.site.u_Inf           = uInfss+perturbation(l);
-    [B1,B2,bc]              = Compute_B1_B2_bc(Wp);
-    sol.u(1:2,1:Wp.mesh.Ny) = Wp.site.u_Inf;
+    
+    
+    % Time loop
+    for k=1:Np
         
-    for k=2:Wp.sim.NN
+        % Apply perturbation
+        Wp.site.u_Inf           = Vs(l,k);
+        [B1,B2,bc]              = Compute_B1_B2_bc(Wp);
+        sol.u(1:2,1:Wp.mesh.Ny) = Wp.site.u_Inf;
+        
         
         % Save velocities in front and behind turbines
-        flow.T1.up(:,:,k,l)   = sol.u(nx1-1,ny1);  % flow.turbine1.upwind(x,y,time,perturbation)
-        flow.T1.down(:,:,k,l) = sol.u(nx1+1,ny1);  % flow.turbine2.downwind(x,y,time,perturbation)
-        flow.T2.up(:,:,k,l)   = sol.u(nx2-1,ny2);  % maybe take mean here
-        flow.T2.down(:,:,k,l) = sol.u(nx2+1,ny2);
-        flow.T3.up(:,:,k,l)   = sol.u(nx3-1,ny3);
-        flow.T3.down(:,:,k,l) = sol.u(nx3+1,ny3);
+        flow.T0.up(k,l)   = mean(sol.u(1,ny1));      % flow upwind windfarm
+        flow.T1.up(k,l)   = mean(sol.u(nx1-1,ny1));  % flow.turbine1.upwind(x,y,time,perturbation)
+        flow.T1.down(k,l) = mean(sol.u(nx1+1,ny1));  % flow.turbine2.downwind(x,y,time,perturbation)
+        flow.T2.up(k,l)   = mean(sol.u(nx2-1,ny2));
+        flow.T2.down(k,l) = mean(sol.u(nx2+1,ny2));
+        flow.T3.up(k,l)   = mean(sol.u(nx3-1,ny3));
+        flow.T3.down(k,l) = mean(sol.u(nx3+1,ny3));
         
         % Build and iterate wind farm
         [sys,Power(:,k),Ueffect(:,k),a(:,k),CT(:,k),Wp] = ...
             Make_Ax_b(Wp,sys,sol,input{k},B1,B2,bc,k,options);              % Create system matrices
         [sol,sys] = Computesol(sys,input{k},sol,k,it,options);              % Compute solution
         [sol,eps] = MapSolution(Wp.mesh.Nx,Wp.mesh.Ny,sol,k,it,options);    % Map solution to field
-                
+        
         %Plot
         if Animate>0;if~rem(k,Animate);Animation;end;end;
         
     end
+    
 end
+
+
 %%
-figure(2);clf
-subplot(3,3,1)
-plot(Power(1,:));grid;xlabel('k');ylabel('P_1')
-subplot(3,3,4)
-plot(a(1,:));grid;xlabel('k');ylabel('a_1')
-subplot(3,3,7)
-plot(Ueffect(1,:));grid;xlabel('k');ylabel('U_1')
+% figure(2);clf
+% subplot(3,3,1)
+% plot(Power(1,:));grid;xlabel('k');ylabel('P_1');axis tight
+% subplot(3,3,4)
+% plot(a(1,:));grid;xlabel('k');ylabel('a_1');axis tight
+% subplot(3,3,7)
+% plot(Ueffect(1,:));grid;xlabel('k');ylabel('U_1');axis tight
+% subplot(3,3,2)
+% plot(Power(2,:));grid;xlabel('k');ylabel('P_2');axis tight
+% subplot(3,3,5)
+% plot(a(2,:));grid;xlabel('k');ylabel('a_2');axis tight
+% subplot(3,3,8)
+% plot(Ueffect(2,:));grid;xlabel('k');ylabel('U_2');axis tight
+% subplot(3,3,3)
+% plot(Power(3,:));grid;xlabel('k');ylabel('P_3');axis tight
+% subplot(3,3,6)
+% plot(a(3,:));grid;xlabel('k');ylabel('a_3');axis tight
+% subplot(3,3,9)
+% plot(Ueffect(3,:));grid;xlabel('k');ylabel('U_3');axis tight
 
-subplot(3,3,2)
-plot(Power(2,:));grid;xlabel('k');ylabel('P_2')
-subplot(3,3,5)
-plot(a(2,:));grid;xlabel('k');ylabel('a_2')
-subplot(3,3,8)
-plot(Ueffect(2,:));grid;xlabel('k');ylabel('U_2')
-
-subplot(3,3,3)
-plot(Power(3,:));grid;xlabel('k');ylabel('P_3')
-subplot(3,3,6)
-plot(a(3,:));grid;xlabel('k');ylabel('a_3')
-subplot(3,3,9)
-plot(Ueffect(3,:));grid;xlabel('k');ylabel('U_3')
+figure(3);clf
+subplot(4,3,[1 3])
+plot(flow.T0.up(:,l));grid;xlabel('k');ylabel('v_0');axis tight
+subplot(4,3,4)
+plot(flow.T1.up(:,l));grid;xlabel('k');ylabel('v_1^{in}');axis tight
+subplot(4,3,7)
+plot(flow.T1.down(:,l));grid;xlabel('k');ylabel('v_1^{out}');axis tight
+subplot(4,3,5)
+plot(flow.T2.up(:,l));grid;xlabel('k');ylabel('v_2^{in}');axis tight
+subplot(4,3,8)
+plot(flow.T2.down(:,l));grid;xlabel('k');ylabel('v_2^{out}');axis tight
+subplot(4,3,6)
+plot(flow.T3.up(:,l));grid;xlabel('k');ylabel('v_3^{in}');axis tight
+subplot(4,3,9)
+plot(flow.T3.down(:,l));grid;xlabel('k');ylabel('v_3^{out}');axis tight

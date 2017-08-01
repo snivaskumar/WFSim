@@ -39,11 +39,11 @@ switch lower(Wp.name)
         
         Drotor      = 90;     % Turbine rotor diameter in (m)
         powerscale  = 1.0;    % Turbine powerscaling
-        forcescale  = 1.25;    % Turbine force scaling
+        forcescale  = 1.25;   % Turbine force scaling
         
         h        = 1.0;       % Sampling time (s)
-        L        = 50;       % Simulation length (s)
-        mu       = 0*18e-5;     % Dynamic flow viscosity
+        L        = 300;       % Simulation length (s)
+        mu       = 0*18e-5;   % Dynamic flow viscosity
         Rho      = 1.20;      % Flow density (kg m-3)
         u_Inf    = 8.0;       % Freestream flow velocity x-direction (m/s)
         v_Inf    = 0.0;       % Freestream flow velocity y-direction (m/s)
