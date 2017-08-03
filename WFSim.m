@@ -13,7 +13,7 @@ options.exportPressures= ~options.Projection;    % Calculate pressure fields
 Wp.name             = 'RobustMpc';      % Meshing name (see "\bin\core\meshing.m")
 Wp.Turbulencemodel  = 'WFSim3';
 
-Animate       = 100;                      % Show 2D flow fields every x iterations (0: no plots)
+Animate       = 0;                      % Show 2D flow fields every x iterations (0: no plots)
 plotMesh      = 0;                      % Show meshing and turbine locations
 conv_eps      = 1e-6;                   % Convergence threshold
 max_it_dyn    = 1;                      % Maximum number of iterations for k > 1
@@ -110,27 +110,34 @@ for l=1:Ns
     
 end
 
-
 %%
-% figure(2);clf
-% subplot(3,3,1)
-% plot(Power(1,:));grid;xlabel('k');ylabel('P_1');axis tight
-% subplot(3,3,4)
-% plot(a(1,:));grid;xlabel('k');ylabel('a_1');axis tight
-% subplot(3,3,7)
-% plot(Ueffect(1,:));grid;xlabel('k');ylabel('U_1');axis tight
-% subplot(3,3,2)
-% plot(Power(2,:));grid;xlabel('k');ylabel('P_2');axis tight
-% subplot(3,3,5)
-% plot(a(2,:));grid;xlabel('k');ylabel('a_2');axis tight
-% subplot(3,3,8)
-% plot(Ueffect(2,:));grid;xlabel('k');ylabel('U_2');axis tight
-% subplot(3,3,3)
-% plot(Power(3,:));grid;xlabel('k');ylabel('P_3');axis tight
-% subplot(3,3,6)
-% plot(a(3,:));grid;xlabel('k');ylabel('a_3');axis tight
-% subplot(3,3,9)
-% plot(Ueffect(3,:));grid;xlabel('k');ylabel('U_3');axis tight
+% Turbine transfer from w = [dU da]^T to y = [dF dP]^T
+y1 = Wp.turbine.yT{1};
+y2 = Wp.turbine.yT{2};
+y3 = Wp.turbine.yT{3};
+w1 = Wp.turbine.wT{1};
+w2 = Wp.turbine.wT{2};
+w3 = Wp.turbine.wT{3};
+
+figure(2);clf
+subplot(3,3,1)
+plot(y1(2,:));grid;xlabel('k');ylabel('\delta P_1');axis tight
+subplot(3,3,4)
+plot(w1(2,:));grid;xlabel('k');ylabel('\delta a_1');axis tight
+subplot(3,3,7)
+plot(w1(1,:));grid;xlabel('k');ylabel('\delta U_1');axis tight
+subplot(3,3,2)
+plot(y2(2,:));grid;xlabel('k');ylabel('\delta P_2');axis tight
+subplot(3,3,5)
+plot(w2(2,:));grid;xlabel('k');ylabel('\delta a_2');axis tight
+subplot(3,3,8)
+plot(w2(1,:));grid;xlabel('k');ylabel('\delta U_2');axis tight
+subplot(3,3,3)
+plot(y3(2,:));grid;xlabel('k');ylabel('\delta P_3');axis tight
+subplot(3,3,6)
+plot(w3(2,:));grid;xlabel('k');ylabel('\delta a_3');axis tight
+subplot(3,3,9)
+plot(w3(1,:));grid;xlabel('k');ylabel('\delta U_3');axis tight
 
 figure(3);clf
 subplot(4,3,[1 3])
@@ -147,3 +154,4 @@ subplot(4,3,6)
 plot(flow.T3.up(:,l));grid;xlabel('k');ylabel('v_3^{in}');axis tight
 subplot(4,3,9)
 plot(flow.T3.down(:,l));grid;xlabel('k');ylabel('v_3^{out}');axis tight
+

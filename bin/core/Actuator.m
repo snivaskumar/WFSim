@@ -59,9 +59,9 @@ for kk=1:N
     %% Input to Ax=b
     if k>=2
         % y = [dF dP]^T
-        w                        = [Wp.turbine.Uinf0{kk}-Ueffect(kk) ; Wp.turbine.a0{kk}-a(kk)];
-        Wp.turbine.xT{kk}(:,k+1) = Wp.turbine.A{kk}*Wp.turbine.xT{kk}(:,k) + Wp.turbine.B{kk}*w;
-        Wp.turbine.yT{kk}(:,k)   = Wp.turbine.C{kk}*Wp.turbine.xT{kk}(:,k) + Wp.turbine.D{kk}*w;
+        Wp.turbine.wT{kk}(:,k)   = [Wp.turbine.Uinf0{kk}-Ueffect(kk) ; Wp.turbine.a0{kk}-a(kk)];
+        Wp.turbine.xT{kk}(:,k+1) = Wp.turbine.A{kk}*Wp.turbine.xT{kk}(:,k) + Wp.turbine.B{kk}*Wp.turbine.wT{kk}(:,k);
+        Wp.turbine.yT{kk}(:,k)   = Wp.turbine.C{kk}*Wp.turbine.xT{kk}(:,k) + Wp.turbine.D{kk}*Wp.turbine.wT{kk}(:,k);
         
         Sm.x(x-2,y-1)  = -(Wp.turbine.F0{kk}-Wp.turbine.yT{kk}(1,k)).*dyy2(1,y)';
         Power(kk)      = Wp.turbine.P0{kk}-Wp.turbine.yT{kk}(2,k);
