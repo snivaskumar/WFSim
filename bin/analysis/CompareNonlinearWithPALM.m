@@ -21,7 +21,7 @@ end
 % Display and visualization settings
 scriptOptions.printProgress     = 1;  % Print progress every timestep
 scriptOptions.printConvergence  = 1;  % Print convergence parameters every timestep
-scriptOptions.Animate           = 10;  % Show 2D flow fields every x iterations (0: no plots)
+scriptOptions.Animate           = 20;  % Show 2D flow fields every x iterations (0: no plots)
 scriptOptions.plotMesh          = 0;  % Show meshing and turbine locations
 
 
@@ -50,7 +50,7 @@ sol.v = squeeze(v(1,:,:));
 % Performing timestepping until end
 disp(['Performing ' num2str(Wp.sim.NN) ' forward simulations..']);
 %% Loop
-Wp.sim.NN = 900;
+Wp.sim.NN = 590;
 while sol.k < Wp.sim.NN
     tic;         % Intialize timer
     
@@ -115,20 +115,20 @@ while sol.k < Wp.sim.NN
             title('error [m/s]');
             hold off;           
             subplot(2,3,4);
-            plot(Wp.sim.time(1:sol.k),turbData.power(1:sol.k,1));hold on
-            plot(Wp.sim.time(1:sol.k),turbData.power(1:sol.k,2),'r');
+            plot(Wp.sim.time(1:sol.k),Power(1,1:sol.k),'k');hold on
+            plot(Wp.sim.time(1:sol.k),turbData.power(1:sol.k,1),'b--');
             title('$P$ [W]','interpreter','latex');
             axis([0,Wp.sim.NN 0 max(max(turbData.power(1:end,:)))+10^5])
-            title('Power PALM')
+            title('Power $T_1$','interpreter','latex')
             grid;hold off;
             drawnow
             
             subplot(2,3,5);
-            plot(Wp.sim.time(1:sol.k),Power(1,1:sol.k));hold on
-            plot(Wp.sim.time(1:sol.k),Power(2,1:sol.k),'r');
+            plot(Wp.sim.time(1:sol.k),turbData.power(1:sol.k,2),'b--');hold on
+            plot(Wp.sim.time(1:sol.k),Power(2,1:sol.k),'k');
             title('$P$ [W]','interpreter','latex');
             axis([0,Wp.sim.NN 0 max(max(turbData.power(1:end,1)))+10^5]);
-            title('Power WFSim')
+            title('Power $T_2$','interpreter','latex')
             grid;hold off;
             drawnow
             
@@ -152,7 +152,7 @@ plot(Wp.sim.time(1:Wp.sim.NN),maxe,'r');grid;
 ylabel('RMSE and max');
 title(['{\color{blue}{RMSE}}, {\color{red}{max}} and meanRMSE = ',num2str(mean(RMSE),3)])
 
-Nt = 850;
+Nt = Wp.sim.NN; % until what time you want to plot
 
 figure(3);clf
 plot(Wp.sim.time(1:Nt),sum(Power(:,1:Nt)),'k','Linewidth',1);hold on;
@@ -207,7 +207,8 @@ end
 
 % Wake centreline
 D_ind    = Wp.mesh.yline{1};
-indices  = [300 400 700 800];
+%indices  = [300 400 700 800];
+indices  = [200 300 400 500];
 
 for k=indices
     up(:,k)      = mean(sol_array{k}.u(:,D_ind),2); 
