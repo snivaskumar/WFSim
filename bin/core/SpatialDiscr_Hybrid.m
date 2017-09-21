@@ -8,6 +8,7 @@ function [output] = SpatialDiscr_Hybrid(Wp,sol,Linearversion)
 % ldxx2 = i
 % ldyy2 = j
 
+
 Nx     = Wp.mesh.Nx;
 Ny     = Wp.mesh.Ny;
 dxx    = Wp.mesh.dxx;
