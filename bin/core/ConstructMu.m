@@ -33,3 +33,4 @@ for kk=1:size(yyline,1)
 end
 
 mu  = (repmat(mux(1:Nx)',1,Ny).*repmat(muy,Nx,1))*0.5*Drotor; % Dynamic flow viscosity
+
