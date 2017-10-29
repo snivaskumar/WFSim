@@ -29,7 +29,7 @@ scriptOptions.plotMesh          = 0;  % Show meshing and turbine locations
 
 %% Script core
 % WFSim: call initialization script
-Wp.name      = '2turb_adm_noturb';
+Wp.name      = '6turb_adm_turb';
 
 run('../../WFSim_addpaths'); % Add paths
 [Wp,sol,sys] = InitWFSim(Wp,scriptOptions);
